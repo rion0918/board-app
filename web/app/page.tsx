@@ -2,6 +2,8 @@
 
 import { gql, useQuery } from '@apollo/client';
 import NextLink from 'next/link';
+import { format } from 'date-fns'; // 日付整形用
+
 import {
   Box,
   Heading,
@@ -18,6 +20,7 @@ const GET_ALL_POSTS = gql`
       id
       title
       content
+      createdAt
     }
   }
 `;
@@ -41,15 +44,20 @@ export default function Home() {
 
       <VStack spacing={4} align="stretch">
         {data.allPosts.map((post: any) => (
-          <Box key={post.id} p={4} borderWidth="1px" borderRadius="md">
-            <NextLink href={`/post/${post.id}`} passHref>
-              <Link fontSize="xl" fontWeight="bold" color="blue.500">
-                {post.title}
-              </Link>
-            </NextLink>
-            <Text mt={2}>{post.content}</Text>
-          </Box>
-        ))}
+  <Box key={post.id} p={4} borderWidth="1px" borderRadius="md">
+    <NextLink href={`/post/${post.id}`} passHref>
+      <Link fontSize="xl" fontWeight="bold" color="blue.500">
+        {post.title}
+      </Link>
+    </NextLink>
+    <Text mt={2}>{post.content}</Text>
+
+    {/* 投稿日の表示を追加 */}
+    <Text fontSize="sm" color="gray.500" mt={2}>
+      投稿日: {format(new Date(post.createdAt), 'yyyy/MM/dd HH:mm')}
+    </Text>
+  </Box>
+))}
       </VStack>
     </Box>
   );
