@@ -1,7 +1,12 @@
-// lib/apollo-client.ts
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 export const client = new ApolloClient({
-  uri: 'http://localhost:3900/graphql', // NestJSのGraphQLエンドポイント
+  link: new HttpLink({
+    uri: 'http://localhost:3900/graphql',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }),
   cache: new InMemoryCache(),
 });

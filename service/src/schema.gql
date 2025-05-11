@@ -7,6 +7,7 @@ type Post {
   title: String!
   content: String!
   createdAt: DateTime!
+  comments: [Comment!]!
 }
 
 """
@@ -14,16 +15,31 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Comment {
+  id: Int!
+  content: String!
+  post: Post!
+  postId: Int!
+  createdAt: DateTime!
+}
+
 type Query {
   allPosts: [Post!]!
   post(id: Int!): Post!
+  findByPost(postId: Int!): [Comment!]!
 }
 
 type Mutation {
   createPost(input: CreatePostInput!): Post!
+  createComment(input: CreateCommentInput!): Comment!
 }
 
 input CreatePostInput {
   title: String!
   content: String!
+}
+
+input CreateCommentInput {
+  content: String!
+  postId: Int!
 }
