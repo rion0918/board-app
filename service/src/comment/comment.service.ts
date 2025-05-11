@@ -13,10 +13,12 @@ export class CommentService {
       data: createCommentInput,
     });
   }
+
+  //指定したIDのコメントを取得するメソッド
   async findByPost(postId: number) {
     return this.prisma.comment.findMany({
       where: { postId },
-      include: { post: true }, // ← これを追加
+      include: { post: true },
     });
   }
 }

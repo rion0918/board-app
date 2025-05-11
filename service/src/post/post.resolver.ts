@@ -20,21 +20,25 @@ export class PostResolver {
     private readonly commentService: CommentService, // ← 追加
   ) {}
 
+  //全件取得
   @Query(() => [Post])
   allPosts(): Promise<Post[]> {
     return this.postService.findAll();
   }
 
+  //ID指定取得
   @Query(() => Post)
   post(@Args('id', { type: () => Int }) id: number): Promise<Post | null> {
     return this.postService.findOne(id);
   }
 
+  //新規投稿
   @Mutation(() => Post)
   createPost(@Args('input') input: CreatePostInput) {
     return this.postService.create(input);
   }
 
+  //コメント機能
   @ResolveField(() => [Comment])
   comments(@Parent() post: Post): Promise<Comment[]> {
     return this.commentService.findByPost(post.id);

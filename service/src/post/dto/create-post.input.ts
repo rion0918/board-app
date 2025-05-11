@@ -9,3 +9,5 @@ export class CreatePostInput {
   @Field()
   content: string;
 }
+
+//ここでは入力の型を定義している
