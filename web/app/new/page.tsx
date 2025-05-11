@@ -1,65 +1,72 @@
 'use client';
 
-import { gql, useMutation } from '@apollo/client';
-import { useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { CREATE_POST } from '@/lib/queries';
 import { useRouter } from 'next/navigation';
-
-const CREATE_POST = gql`
-  mutation CreatePost($input: CreatePostInput!) {
-    createPost(input: $input) {
-      id
-      title
-    }
-  }
-`;
+import { useState } from 'react';
+import {
+  Box,
+  Heading,
+  Input,
+  Textarea,
+  Button,
+  VStack,
+  useToast,
+} from '@chakra-ui/react';
 
 export default function NewPostPage() {
   const router = useRouter();
+  const toast = useToast();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [createPost, { loading, error }] = useMutation(CREATE_POST);
+  const [createPost] = useMutation(CREATE_POST);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      await createPost({
+      const res = await createPost({
         variables: { input: { title, content } },
-        refetchQueries: ['GetAllPosts'], // 投稿後に投稿一覧を再取得
       });
-      router.push('/'); // 投稿後、トップページへ戻る
+      const newPostId = res.data?.createPost?.id;
+      if (newPostId) {
+        router.push('/');
+      }
     } catch (err) {
-      console.error(err);
+      toast({
+        title: '投稿に失敗しました',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <main className="p-8 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">新しい投稿を作成</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="タイトル"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="border p-2 rounded"
-          required
-        />
-        <textarea
-          placeholder="本文"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="border p-2 rounded min-h-[150px]"
-          required
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          投稿する
-        </button>
-        {error && <p className="text-red-500">投稿に失敗しました: {error.message}</p>}
+    <Box maxW="xl" mx="auto" py={10} px={6}>
+      <Heading mb={6}>新規投稿</Heading>
+      <form onSubmit={handleSubmit}>
+        <VStack gap={4}>
+          <Input
+            placeholder="タイトル"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            isRequired
+          />
+          <Textarea
+            placeholder="本文"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            isRequired
+          />
+          <Button isLoading={loading} colorScheme="teal" type="submit">
+            投稿する
+          </Button>
+        </VStack>
       </form>
-    </main>
+    </Box>
   );
 }
