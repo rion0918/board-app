@@ -1,4 +1,4 @@
-# 📝 神戸電子7DAYS掲示板アプリ
+# 📝 神戸電子2DAYS掲示板アプリ
 
 Next.js × NestJS × GraphQL × Chakra UI で構成されたシンプルな掲示板アプリです。
 
