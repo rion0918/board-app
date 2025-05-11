@@ -5,8 +5,11 @@ import { PostResolver } from './post.resolver';
 import { PrismaModule } from '../prisma/prisma.module';
 import { CommentModule } from 'src/comment/comment.module';
 
+import { ScheduleModule } from '@nestjs/schedule';
+import { PostCron } from './post.cron';
+
 @Module({
-  imports: [PrismaModule, CommentModule],
-  providers: [PostService, PostResolver],
+  imports: [PrismaModule, CommentModule, ScheduleModule.forRoot()],
+  providers: [PostService, PostResolver, PostCron],
 })
 export class PostModule {}

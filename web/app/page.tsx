@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <Box p={8}>
-      <Heading mb={4}>神戸電子7DAYS掲示板</Heading>
+      <Heading mb={4}>神戸電子2DAYS掲示板</Heading>
       <Heading size="md" mb={4}>投稿一覧</Heading>
 
       <NextLink href="/new" passHref>
