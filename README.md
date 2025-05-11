@@ -11,7 +11,7 @@ Next.js × NestJS × GraphQL × Chakra UI で構成されたシンプルな掲�
 | フロント   | Next.js (App Router) / Apollo Client / Chakra UI |
 | バックエンド | NestJS / GraphQL (Code First) / Prisma ORM       |
 | データベース | PostgreSQL                                       |
-| その他     | TypeScript / pnpm / Emotion / Framer Motion       |
+| その他     | TypeScript / pnpm                                 |
 
 ---
 
