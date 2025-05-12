@@ -3,7 +3,7 @@
 import { gql, useQuery } from "@apollo/client"
 import NextLink from "next/link"
 import { format } from "date-fns"
-import { FaXTwitter } from "react-icons/fa6"
+import { FaTwitter } from "react-icons/fa"
 import {
   Box,
   Container,
@@ -184,7 +184,7 @@ export default function Home() {
               color="white"
               _hover={{ color: "gray.300" }}
             >
-              <FaXTwitter size="1.2em" />
+              <FaTwitter size="1.2em" />
             </Link>
           </Flex>
         </Container>
