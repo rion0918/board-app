@@ -1,10 +1,16 @@
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
+const graphqlUri = process.env.NEXT_PUBLIC_GRAPHQL_API_URL;
+
+if (!graphqlUri) {
+  throw new Error(
+    'Environment variable NEXT_PUBLIC_GRAPHQL_API_URL is not set.'
+  );
+}
+
 export const client = new ApolloClient({
   link: new HttpLink({
-    uri:
-      process.env.NEXT_PUBLIC_GRAPHQL_API_URL ||
-      'http://localhost:3900/graphql',
+    uri: graphqlUri,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
