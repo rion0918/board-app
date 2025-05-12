@@ -62,6 +62,10 @@ export default function Home() {
   }
 
   return (
+  <>
+    <Box bg="blue.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
+         神戸電子2Days掲示板 Ver.0.0.1
+    </Box>
     <Box bg="gray.50" minH="100vh" py={8}>
       <Container maxW="container.md">
         <VStack spacing={8} align="center">
@@ -147,5 +151,6 @@ export default function Home() {
         </VStack>
       </Container>
     </Box>
+  </>
   )
 }
