@@ -12,6 +12,7 @@ import {
   Textarea,
   Button,
   Spinner,
+  Divider,
 } from '@chakra-ui/react';
 
 export default function PostDetailPage() {
@@ -46,16 +47,6 @@ export default function PostDetailPage() {
       <Text mb={6}>{post.content}</Text>
 
       <Heading size="md" mt={8} mb={4}>コメント</Heading>
-      <VStack align="stretch" spacing={4} mb={6}>
-        {post.comments.map((comment: any) => (
-          <Box key={comment.id} borderWidth="1px" borderRadius="md" p={4}>
-            <Text>{comment.content}</Text>
-            <Text fontSize="sm" color="gray.500" mt={2}>
-              {new Date(comment.createdAt).toLocaleString()}
-            </Text>
-          </Box>
-        ))}
-      </VStack>
 
       <Box as="form" onSubmit={handleSubmit}>
         <Textarea
@@ -74,6 +65,20 @@ export default function PostDetailPage() {
           コメントする
         </Button>
       </Box>
+
+      <Divider my={6} /> 
+
+      
+      <VStack align="stretch" spacing={4} mb={6}>
+        {post.comments.map((comment: any) => (
+          <Box key={comment.id} borderWidth="1px" borderRadius="md" p={4}>
+            <Text>{comment.content}</Text>
+            <Text fontSize="sm" color="gray.500" mt={2}>
+              {new Date(comment.createdAt).toLocaleString()}
+            </Text>
+          </Box>
+        ))}
+      </VStack>
     </Box>
   );
 }
