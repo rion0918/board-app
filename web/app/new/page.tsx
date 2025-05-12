@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client';
 import { CREATE_POST } from '@/lib/queries';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import NextLink from 'next/link';
 import {
   Box,
   Heading,
@@ -12,6 +13,7 @@ import {
   Button,
   VStack,
   useToast,
+  Link,
 } from '@chakra-ui/react';
 
 export default function NewPostPage() {
@@ -46,27 +48,45 @@ export default function NewPostPage() {
   };
 
   return (
-    <Box maxW="xl" mx="auto" py={10} px={6}>
-      <Heading mb={6}>新規投稿</Heading>
-      <form onSubmit={handleSubmit}>
-        <VStack gap={4}>
-          <Input
-            placeholder="タイトル"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            isRequired
-          />
-          <Textarea
-            placeholder="本文"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            isRequired
-          />
-          <Button isLoading={loading} colorScheme="teal" type="submit">
-            投稿する
-          </Button>
-        </VStack>
-      </form>
-    </Box>
+    <>
+      <Box bg="blue.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
+        神戸電子2Days掲示板 Ver.0.0.2
+      </Box>
+      
+      <Box mb={4}>
+        <NextLink href="/" passHref>
+          <Link
+            color="blue.500"
+            fontWeight="bold"
+            _hover={{ textDecoration: 'underline' }}
+          >
+            ← メインページに戻る
+          </Link>
+        </NextLink>
+      </Box>
+
+      <Box maxW="xl" mx="auto" py={10} px={6}>
+        <Heading mb={6}>新規投稿</Heading>
+        <form onSubmit={handleSubmit}>
+          <VStack gap={4}>
+            <Input
+              placeholder="タイトル"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              isRequired
+            />
+            <Textarea
+              placeholder="本文"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              isRequired
+            />
+            <Button isLoading={loading} colorScheme="teal" type="submit">
+              投稿する
+            </Button>
+          </VStack>
+        </form>
+      </Box>
+    </>
   );
 }
