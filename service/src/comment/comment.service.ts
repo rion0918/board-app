@@ -8,7 +8,7 @@ export class CommentService {
   constructor(private readonly prisma: PrismaService) {}
 
   //コメントを作成するメソッド
-  create(createCommentInput: CreateCommentInput) {
+  async create(createCommentInput: CreateCommentInput) {
     return this.prisma.comment.create({
       data: createCommentInput,
     });

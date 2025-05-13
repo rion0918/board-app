@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-export const GET_COMMENTS = gql`
+export const GET_POSTS = gql`
   query GetPost($id: Int!) {
     post(id: $id) {
       id
