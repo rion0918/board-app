@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
@@ -23,6 +23,7 @@ import {
   IconButton,
   useColorMode,
   useColorModeValue,
+  Badge,            // 追加
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -33,11 +34,11 @@ import {
 import { GET_ALL_POSTS, CREATE_REACTION } from "@/lib/queries";
 
 // フロントで扱うリアクションタイプを定義
-const REACTION_TYPE = "laugh"; // サーバー側でこの type を受け付けること
+const REACTION_TYPE = "laugh";
 
 export default function Home() {
-  // --- ここに更新履歴を定義 ---
   const updates = [
+    { date: "2025/05/13", text: "公式機能" },
     { date: "2025/05/13", text: "投稿字数の変更" },
     { date: "2025/05/13", text: "並び順エラー修正" },
     { date: "2025/05/13", text: "いいね機能にトーストを追加" },
@@ -107,7 +108,6 @@ export default function Home() {
     }
   };
 
-  // ローディング中の Skeleton
   if (loading) {
     return (
       <Container maxW="container.md" py={8}>
@@ -121,7 +121,6 @@ export default function Home() {
     );
   }
 
-  // エラー表示
   if (error) {
     return (
       <Center h="100vh">
@@ -141,7 +140,6 @@ export default function Home() {
 
   return (
     <>
-      {/* カラーモード切替ボタン */}
       <IconButton
         aria-label="カラーモード切替"
         icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
@@ -152,7 +150,6 @@ export default function Home() {
         zIndex={10}
       />
 
-      {/* バージョン表示 */}
       <Box
         bg="green.500"
         py={2}
@@ -162,10 +159,9 @@ export default function Home() {
         fontWeight="bold"
         fontSize="sm"
       >
-        神戸電子2Days掲示板 Ver.0.1.3
+        神戸電子2Days掲示板 Ver.0.1.4
       </Box>
 
-      {/* アップデート情報トグル */}
       <Box maxW="container.md" mx="auto" mt={2} px={4}>
         <IconButton
           aria-label="アップデート情報を展開"
@@ -179,7 +175,7 @@ export default function Home() {
             p={4}
             bg={useColorModeValue("gray.50", "gray.700")}
             borderWidth="1px"
-            borderColor={useColorModeValue("gray.200", "gray.600")}
+            borderColor={borderColor}
             borderRadius="md"
             mt={2}
           >
@@ -195,32 +191,21 @@ export default function Home() {
       <Box bg={useColorModeValue("gray.50", "gray.900")} minH="100vh" py={8}>
         <Container maxW="container.md">
           <VStack spacing={8} align="center">
-            {/* ロゴ */}
-            <Box textAlign="center">
-              <Image
-                src="/image/KIB.png"
-                alt="神戸電子掲示板 ロゴ"
-                boxSize={{ base: "150px", md: "200px" }}
-                objectFit="cover"
-                mx="auto"
-                borderRadius="full"
-                border="3px solid"
-                borderColor="green.400"
-                shadow="lg"
-                transition="transform 0.3s"
-                _hover={{ transform: "scale(1.05)" }}
-              />
-            </Box>
+            <Image
+              src="/image/KIB.png"
+              alt="神戸電子掲示板 ロゴ"
+              boxSize={{ base: "150px", md: "200px" }}
+              objectFit="cover"
+              borderRadius="full"
+              border="3px solid"
+              borderColor="green.400"
+              shadow="lg"
+              transition="transform 0.3s"
+              _hover={{ transform: "scale(1.05)" }}
+            />
 
-            {/* ヘッダー */}
             <Box textAlign="center" w="full">
-              <Heading
-                size="xl"
-                mb={6}
-                color="green.600"
-                fontWeight="bold"
-                letterSpacing="wide"
-              >
+              <Heading size="xl" mb={6} color="green.600" fontWeight="bold">
                 投稿一覧
               </Heading>
               <NextLink href="/new" passHref>
@@ -228,8 +213,8 @@ export default function Home() {
                   colorScheme="green"
                   mb={8}
                   size="lg"
-                  shadow="md"
                   leftIcon={<AddIcon />}
+                  shadow="md"
                   _hover={{ transform: "translateY(-2px)", shadow: "lg" }}
                   transition="all 0.2s"
                 >
@@ -238,23 +223,22 @@ export default function Home() {
               </NextLink>
             </Box>
 
-            {/* 説明文 */}
-            <Box textAlign="center" px={4}>
-              <Text fontSize="md" color="gray.600" maxW="600px" mx="auto">
-                〜神戸電子2Days掲示板〜<br />
-                ここは神戸電子生が匿名でつぶやきをする場所<br />
-                つぶやき（投稿）は2日で自動削除されます。<br />
-                存分につぶやきましょう〜
-              </Text>
-            </Box>
+            <Text fontSize="md" color="gray.600" maxW="600px" textAlign="center" px={4}>
+              〜神戸電子2Days掲示板〜<br />
+              ここは神戸電子生が匿名でつぶやきをする場所<br />
+              つぶやき（投稿）は2日で自動削除されます。<br />
+              存分につぶやきましょう〜
+            </Text>
 
-            {/* 投稿リスト */}
             <VStack spacing={5} align="stretch" w="full">
               {data.allPosts.map((post: any) => {
                 const hasReacted = reactedPosts.includes(post.id);
                 const reactCount = post.reactions.filter(
                   (r: { type: string }) => r.type === REACTION_TYPE
                 ).length;
+                const isOfficial = 
+                  typeof window !== "undefined" &&
+                  localStorage.getItem(`official_post_${post.id}`) === "true";
 
                 return (
                   <Box
@@ -273,19 +257,20 @@ export default function Home() {
                     transition="all 0.2s"
                   >
                     <NextLink href={`/post/${post.id}`} passHref>
-                      <Link
-                        _hover={{ textDecoration: "none" }}
-                        _focus={{ boxShadow: "outline" }}
-                        display="block"
-                        style={{ textDecoration: "none" }}
-                      >
-                        <Text fontSize="xl" fontWeight="bold" color="green.500">
-                          {post.title}
-                        </Text>
+                      <Link _hover={{ textDecoration: "none" }}>
+                        <Flex align="center">
+                          <Text fontSize="xl" fontWeight="bold" color="green.500">
+                            {post.title}
+                          </Text>
+                          {isOfficial && (
+                            <Badge ml={2} colorScheme="blue" variant="subtle">
+                              公式
+                            </Badge>
+                          )}
+                        </Flex>
                       </Link>
                     </NextLink>
 
-                    {/* 折りたたみ可能な本文 */}
                     <Collapse in={showMore[post.id]} animateOpacity>
                       <Text mt={3} color="gray.600">
                         {post.content}
@@ -301,10 +286,7 @@ export default function Home() {
                         variant="link"
                         size="sm"
                         onClick={() =>
-                          setShowMore((prev) => ({
-                            ...prev,
-                            [post.id]: !prev[post.id],
-                          }))
+                          setShowMore((prev) => ({ ...prev, [post.id]: !prev[post.id] }))
                         }
                         aria-label={showMore[post.id] ? "閉じる" : "続きを読む"}
                       >
@@ -313,7 +295,7 @@ export default function Home() {
                     )}
 
                     <Flex justify="space-between" mt={3} align="center">
-                      <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                      <Text fontSize="sm" color="gray.500">
                         投稿日: {format(new Date(post.createdAt), "MM/dd HH:mm")}
                       </Text>
                       <Text fontSize="sm" color="gray.500">
@@ -341,20 +323,13 @@ export default function Home() {
         </Container>
       </Box>
 
-      {/* フッター */}
       <Box as="footer" bg="green.500" py={4} mt={12}>
         <Container maxW="container.md">
           <Flex justify="center" align="center" gap={2}>
             <Text fontSize="sm" color="white">
               © 2025 神戸電子2Days掲示板｜開発者→
             </Text>
-            <Link
-              href="https://x.com/rioi7_0918"
-              isExternal
-              color="white"
-              _hover={{ color: "gray.300" }}
-              aria-label="開発者のTwitterへ"
-            >
+            <Link href="https://x.com/rioi7_0918" isExternal color="white">
               <FaTwitter size="1.2em" />
             </Link>
           </Flex>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,10 +18,14 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  Switch,                // 追加
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { useMutation } from "@apollo/client";
 import { CREATE_POST } from "@/lib/queries";
+
+// ハードコーディングする公式パスワード
+const ADMIN_PASSWORD = "0715";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -30,6 +34,9 @@ export default function NewPostPage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isOfficial, setIsOfficial] = useState(false);     // 公式フラグ用ステート
+  const [password, setPassword] = useState("");            // パスワード用ステート
+
   const [createPost, { loading }] = useMutation(CREATE_POST);
 
   const bg = useColorModeValue("white", "gray.700");
@@ -37,18 +44,40 @@ export default function NewPostPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 公式投稿時のみパスワード検証
+    if (isOfficial && password !== ADMIN_PASSWORD) {
+      toast({
+        title: "パスワードが違います",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       const res = await createPost({
-        variables: { input: { title: title.trim(), content: content.trim() } },
+        variables: {
+          input: {
+            title: title.trim(),
+            content: content.trim(),
+          },
+        },
       });
       const newPostId = res.data?.createPost?.id;
+
+      // 公式投稿だったら localStorage にフラグを保存
+      if (isOfficial && newPostId) {
+        localStorage.setItem(`official_post_${newPostId}`, "true");
+      }
+
       toast({
-        title: newPostId ? "投稿に成功しました！" : "投稿が完了しました",
+        title: "投稿に成功しました！",
         status: "success",
         duration: 2000,
         isClosable: true,
       });
-      // 少し待ってからトップへ遷移
       setTimeout(() => router.push("/"), 500);
     } catch (err) {
       console.error(err);
@@ -62,7 +91,11 @@ export default function NewPostPage() {
     }
   };
 
-  const isSubmitDisabled = !title.trim() || !content.trim() || loading;
+  const isSubmitDisabled =
+    !title.trim() ||
+    !content.trim() ||
+    loading ||
+    (isOfficial && password.trim().length === 0);
 
   return (
     <>
@@ -78,11 +111,26 @@ export default function NewPostPage() {
       />
 
       {/* バージョン表示 */}
-      <Box bg="green.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
-        神戸電子2Days掲示板 Ver.0.1.3
+      <Box
+        bg="green.500"
+        py={2}
+        px={4}
+        color="white"
+        textAlign="center"
+        fontWeight="bold"
+        fontSize="sm"
+      >
+        神戸電子2Days掲示板 Ver.0.1.4
       </Box>
 
-      <Box maxW="xl" mx="auto" py={10} px={6} bg={useColorModeValue("gray.50", "gray.900")} minH="100vh">
+      <Box
+        maxW="xl"
+        mx="auto"
+        py={10}
+        px={6}
+        bg={useColorModeValue("gray.50", "gray.900")}
+        minH="100vh"
+      >
         {/* 戻るリンク */}
         <Box mb={6}>
           <NextLink href="/" passHref>
@@ -97,13 +145,21 @@ export default function NewPostPage() {
           </NextLink>
         </Box>
 
-        <Box bg={bg} borderWidth="1px" borderColor={border} borderRadius="md" p={6} shadow="sm">
+        <Box
+          bg={bg}
+          borderWidth="1px"
+          borderColor={border}
+          borderRadius="md"
+          p={6}
+          shadow="sm"
+        >
           <Heading mb={4} size="lg">
             新規投稿
           </Heading>
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={5} align="stretch">
+              {/* タイトル */}
               <FormControl isRequired>
                 <FormLabel>タイトル</FormLabel>
                 <Input
@@ -118,6 +174,7 @@ export default function NewPostPage() {
                 </FormHelperText>
               </FormControl>
 
+              {/* 本文 */}
               <FormControl isRequired>
                 <FormLabel>本文</FormLabel>
                 <Textarea
@@ -133,6 +190,35 @@ export default function NewPostPage() {
                 </FormHelperText>
               </FormControl>
 
+              {/* 公式投稿フラグ */}
+              <FormControl display="flex" alignItems="center">
+                <FormLabel htmlFor="official-switch" mb="0">
+                  公式投稿にする
+                </FormLabel>
+                <Switch
+                  id="official-switch"
+                  isChecked={isOfficial}
+                  onChange={(e) => setIsOfficial(e.target.checked)}
+                />
+              </FormControl>
+
+              {/* 公式パスワード入力欄（公式時のみ表示） */}
+              {isOfficial && (
+                <FormControl isRequired>
+                  <FormLabel>公式パスワード</FormLabel>
+                  <Input
+                    type="password"
+                    placeholder="パスワードを入力"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <FormHelperText>
+                    公式投稿用のパスワードを入力してください
+                  </FormHelperText>
+                </FormControl>
+              )}
+
+              {/* 送信ボタン */}
               <Button
                 type="submit"
                 colorScheme="green"
