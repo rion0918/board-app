@@ -22,8 +22,17 @@ import {
   useColorModeValue,
   Center,
   Collapse,
+  FormControl,
+  FormLabel,
+  Input,
+  Switch,
+  Badge,             // 追加
+  Flex,              // 追加
 } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
+
+// 公式コメント用ハードコーディングパスワード
+const ADMIN_PASSWORD = '0715'
 
 export default function PostDetailPage() {
   const { id } = useParams()
@@ -46,41 +55,65 @@ export default function PostDetailPage() {
     fetchPolicy: 'network-only',
   })
 
-  // コメントを作成日時順（昇順）にソート
-  const sortedComments = data?.post?.comments
-    ? [...data.post.comments].sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      )
-    : []
+  // フロント側で管理する公式投稿フラグ
+  const isPostOfficial = typeof window !== 'undefined'
+    ? localStorage.getItem(`official_post_${postId}`) === 'true'
+    : false
 
+  // コメント用ステート
   const [content, setContent] = useState('')
-  const [createComment, { loading: posting }] = useMutation(CREATE_COMMENT)
+  const [isCommentOfficial, setIsCommentOfficial] = useState(false)
+  const [commentPassword, setCommentPassword] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      await createComment({ variables: { input: { content, postId } } })
+  const [createComment, { loading: posting }] = useMutation(CREATE_COMMENT, {
+    onCompleted: (res) => {
+      const newCommentId = res.createComment.id
+      // 公式コメントなら localStorage に
+      if (isCommentOfficial) {
+        localStorage.setItem(`official_comment_${newCommentId}`, 'true')
+      }
       setContent('')
-      await refetch()
+      setCommentPassword('')
+      setIsCommentOfficial(false)
+      refetch()
       toast({
         title: 'コメントを投稿しました',
         status: 'success',
         duration: 2000,
         isClosable: true,
       })
-    } catch (e) {
-      console.error(e)
+    },
+    onError: () => {
       toast({
-        title: '投稿に失敗しました',
+        title: 'コメントの送信に失敗しました',
         status: 'error',
         duration: 2000,
         isClosable: true,
       })
+    },
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isCommentOfficial && commentPassword !== ADMIN_PASSWORD) {
+      toast({
+        title: '公式パスワードが違います',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
+      return
     }
+    createComment({ variables: { input: { content, postId } } })
   }
 
-  // 色モードごとの背景色
+  // ソート済みコメント
+  const sortedComments = data?.post?.comments
+    ? [...data.post.comments].sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      )
+    : []
+
   const bg = useColorModeValue('white', 'gray.700')
   const border = useColorModeValue('gray.200', 'gray.600')
 
@@ -98,20 +131,26 @@ export default function PostDetailPage() {
       />
 
       {/* バージョン */}
-      <Box bg="green.500" color="white" textAlign="center" py={2} fontSize="sm" fontWeight="bold">
-        神戸電子2Days掲示板 Ver.0.1.3
+      <Box
+        bg="green.500"
+        color="white"
+        textAlign="center"
+        py={2}
+        fontSize="sm"
+        fontWeight="bold"
+      >
+        神戸電子2Days掲示板 Ver.0.1.4
       </Box>
 
       <Box maxW="2xl" mx="auto" p={6} bg={useColorModeValue('gray.50', 'gray.900')} minH="100vh">
         <Box mb={4}>
           <NextLink href="/" passHref>
-            <Link color="blue.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }} aria-label="メインページに戻る">
+            <Link color="blue.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
               ← メインページに戻る
             </Link>
           </NextLink>
         </Box>
 
-        {/* ローディング：Skeleton */}
         {loading ? (
           <Box>
             <Skeleton height="32px" mb="4" />
@@ -135,9 +174,16 @@ export default function PostDetailPage() {
           <>
             {/* 投稿詳細 */}
             <Box p={6} bg={bg} borderWidth="1px" borderColor={border} borderRadius="md" mb={8}>
-              <Heading size="lg" mb={4}>
-                {data.post.title}
-              </Heading>
+              <Flex align="center" mb={4}>
+                <Heading size="lg" mr={2}>
+                  {data.post.title}
+                </Heading>
+                {isPostOfficial && (
+                  <Badge colorScheme="blue" variant="subtle">
+                    公式
+                  </Badge>
+                )}
+              </Flex>
               <Collapse in={true} startingHeight={100}>
                 <Text whiteSpace="pre-wrap" color={useColorModeValue('gray.800', 'gray.200')}>
                   {data.post.content}
@@ -158,12 +204,32 @@ export default function PostDetailPage() {
                 borderColor={border}
                 _placeholder={{ color: 'gray.400' }}
               />
-              <Button
-                type="submit"
-                colorScheme="green"
-                isLoading={posting}
-                aria-label="コメントを投稿"
-              >
+
+              {/* 公式コメント切替 */}
+              <FormControl display="flex" alignItems="center" mb={3}>
+                <FormLabel htmlFor="official-switch" mb="0">
+                  公式コメントにする
+                </FormLabel>
+                <Switch
+                  id="official-switch"
+                  isChecked={isCommentOfficial}
+                  onChange={(e) => setIsCommentOfficial(e.target.checked)}
+                />
+              </FormControl>
+
+              {isCommentOfficial && (
+                <FormControl isRequired mb={3}>
+                  <FormLabel>公式パスワード</FormLabel>
+                  <Input
+                    type="password"
+                    placeholder="パスワードを入力"
+                    value={commentPassword}
+                    onChange={(e) => setCommentPassword(e.target.value)}
+                  />
+                </FormControl>
+              )}
+
+              <Button type="submit" colorScheme="green" isLoading={posting}>
                 コメントする
               </Button>
             </Box>
@@ -177,27 +243,37 @@ export default function PostDetailPage() {
                   コメントはまだありません
                 </Text>
               )}
-              {sortedComments.map((comment: any) => (
-                <Box
-                  key={comment.id}
-                  p={4}
-                  bg={bg}
-                  borderWidth="1px"
-                  borderColor={border}
-                  borderRadius="md"
-                >
-                  <Text whiteSpace="pre-wrap">{comment.content}</Text>
-                  <Text fontSize="sm" color="gray.500" mt={2}>
-                    {new Date(comment.createdAt).toLocaleDateString('ja-JP', {
-                      month: 'numeric',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit',
-                    })}
-                  </Text>
-                </Box>
-              ))}
+              {sortedComments.map((comment: any) => {
+                const isCmtOfficial = localStorage.getItem(`official_comment_${comment.id}`) === 'true'
+                return (
+                  <Box
+                    key={comment.id}
+                    p={4}
+                    bg={bg}
+                    borderWidth="1px"
+                    borderColor={border}
+                    borderRadius="md"
+                  >
+                    <Flex align="center">
+                      <Text whiteSpace="pre-wrap">{comment.content}</Text>
+                      {isCmtOfficial && (
+                        <Badge ml={2} colorScheme="blue" variant="subtle">
+                          公式
+                        </Badge>
+                      )}
+                    </Flex>
+                    <Text fontSize="sm" color="gray.500" mt={2}>
+                      {new Date(comment.createdAt).toLocaleDateString('ja-JP', {
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      })}
+                    </Text>
+                  </Box>
+                )
+              })}
             </VStack>
           </>
         )}
