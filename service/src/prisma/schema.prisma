@@ -14,11 +14,12 @@ datasource db {
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   title     String
   content   String
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
   comments  Comment[]
+  Reactions Reaction[]
 }
 
 model Comment {
@@ -27,4 +28,12 @@ model Comment {
   post      Post     @relation(fields: [postId], references: [id])
   postId    Int
   createdAt DateTime @default(now())
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now())
+  type      String //ex: "like","sad"など
 }

@@ -1,9 +1,10 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client"
+import { gql, useMutation, useQuery } from "@apollo/client"
 import NextLink from "next/link"
 import { format } from "date-fns"
 import { FaTwitter } from "react-icons/fa"
+import { GET_ALL_POSTS, CREATE_REACTION } from "@/lib/queries"
 import {
   Box,
   Container,
@@ -20,28 +21,28 @@ import {
 } from "@chakra-ui/react"
 import { AddIcon } from "@chakra-ui/icons"
 
-const GET_ALL_POSTS = gql`
-  query GetAllPosts {
-    allPosts {
-      id
-      title
-      content
-      createdAt
-      comments {
-        id
-      }
-    }
-  }
-`
 
 export default function Home() {
   const { data, loading, error } = useQuery(GET_ALL_POSTS, {
     fetchPolicy: "network-only",
   })
 
+  const handleReaction = async (postId: number, type: string) => {
+    await createReaction({
+      variables: {
+        input: {
+          type,
+          postId,
+        },
+      },
+    })
+  }
+
   const bgColor = useColorModeValue("white", "gray.800")
   const cardBgColor = useColorModeValue("white", "gray.700")
   const borderColor = useColorModeValue("gray.200", "gray.600")
+
+  const [createReaction] = useMutation(CREATE_REACTION)
 
   if (loading) {
     return (
@@ -63,6 +64,8 @@ export default function Home() {
       </Center>
     )
   }
+
+  
 
   return (
     <>
@@ -124,25 +127,27 @@ export default function Home() {
             {/* 投稿リスト */}
             <VStack spacing={5} align="stretch" w="full">
               {data.allPosts.map((post: any) => (
-                <NextLink href={`/post/${post.id}`} passHref key={post.id}>
-                  <Link
-                    _hover={{ textDecoration: "none" }}
-                    _focus={{ boxShadow: "outline" }}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Box
-                      p={5}
-                      borderWidth="1px"
-                      borderRadius="lg"
-                      borderColor={borderColor}
-                      bg={cardBgColor}
-                      shadow="md"
-                      _hover={{
-                        shadow: "lg",
-                        transform: "translateY(-2px)",
-                        borderColor: "blue.200",
-                      }}
-                      transition="all 0.2s"
+                <Box
+                  key={post.id}
+                  p={5}
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  borderColor={borderColor}
+                  bg={cardBgColor}
+                  shadow="md"
+                  _hover={{
+                    shadow: "lg",
+                    transform: "translateY(-2px)",
+                    borderColor: "blue.200",
+                  }}
+                  transition="all 0.2s"
+                >
+                  <NextLink href={`/post/${post.id}`} passHref>
+                    <Link
+                      _hover={{ textDecoration: "none" }}
+                      _focus={{ boxShadow: "outline" }}
+                      style={{ textDecoration: "none" }}
+                      display="block"
                     >
                       <Text fontSize="xl" fontWeight="bold" color="blue.500">
                         {post.title}
@@ -153,18 +158,26 @@ export default function Home() {
                           {post.content}
                         </Text>
                       </Box>
+                    </Link>
+                  </NextLink>
 
-                      <Flex justify="space-between" mt={3} align="center">
-                        <Text fontSize="sm" color="gray.500" fontWeight="medium">
-                          投稿日: {format(new Date(post.createdAt), "yyyy/MM/dd HH:mm")}
-                        </Text>
-                        <Text fontSize="sm" color="gray.500">
-                          コメント数: {post.comments.length}
-                        </Text>
-                      </Flex>
-                    </Box>
-                  </Link>
-                </NextLink>
+                  <Flex justify="space-between" mt={3} align="center">
+                    <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                      投稿日: {format(new Date(post.createdAt), "yyyy/MM/dd HH:mm")}
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      コメント数: {post.comments.length}
+                    </Text>
+                    <Button
+                      size="sm"
+                      colorScheme="blue"
+                      variant="ghost"
+                      onClick={() => handleReaction(post.id, "like")}
+                    >
+                      👍 いいね
+                    </Button>
+                  </Flex>
+                </Box>
               ))}
             </VStack>
           </VStack>

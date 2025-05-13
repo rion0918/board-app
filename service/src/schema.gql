@@ -8,6 +8,7 @@ type Post {
   content: String!
   createdAt: DateTime!
   comments: [Comment!]!
+  reactions: [Reaction!]!
 }
 
 """
@@ -23,6 +24,13 @@ type Comment {
   createdAt: DateTime!
 }
 
+type Reaction {
+  id: Int!
+  type: String!
+  postId: Int!
+  createdAt: DateTime!
+}
+
 type Query {
   allPosts: [Post!]!
   post(id: Int!): Post!
@@ -32,6 +40,7 @@ type Query {
 type Mutation {
   createPost(input: CreatePostInput!): Post!
   createComment(input: CreateCommentInput!): Comment!
+  createReaction(input: CreateReactionInput!): Reaction!
 }
 
 input CreatePostInput {
@@ -41,5 +50,10 @@ input CreatePostInput {
 
 input CreateCommentInput {
   content: String!
+  postId: Int!
+}
+
+input CreateReactionInput {
+  type: String!
   postId: Int!
 }

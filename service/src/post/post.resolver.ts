@@ -12,12 +12,15 @@ import { CreatePostInput } from './dto/create-post.input';
 import { Post } from './entities/post.entity';
 import { CommentService } from '../comment/comment.service';
 import { Comment } from '../comment/entities/comment.entity';
+import { Reaction } from 'src/reaction/entities/reaction.entity';
+import { ReactionService } from '../reaction/reaction.service';
 
 @Resolver(() => Post)
 export class PostResolver {
   constructor(
     private readonly postService: PostService,
-    private readonly commentService: CommentService, // ← 追加
+    private readonly commentService: CommentService,
+    private readonly reactionService: ReactionService,
   ) {}
 
   //全件取得
@@ -42,5 +45,11 @@ export class PostResolver {
   @ResolveField(() => [Comment])
   comments(@Parent() post: Post): Promise<Comment[]> {
     return this.commentService.findByPost(post.id);
+  }
+
+  //リアクション機能
+  @ResolveField(() => [Reaction])
+  reactions(@Parent() post: Post) {
+    return this.reactionService.findByPost(post.id);
   }
 }
