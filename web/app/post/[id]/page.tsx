@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import { useParams } from 'next/navigation';
-import { useQuery, useMutation } from '@apollo/client';
-import { GET_COMMENTS, CREATE_COMMENT } from '@/lib/queries';
-import { useState } from 'react';
-import NextLink from 'next/link';
+import { useParams, useRouter } from 'next/navigation'
+import { useQuery, useMutation } from '@apollo/client'
+import { GET_COMMENTS, CREATE_COMMENT } from '@/lib/queries'
+import { useState } from 'react'
+import NextLink from 'next/link'
 import {
   Box,
   Heading,
@@ -15,86 +15,180 @@ import {
   Spinner,
   Divider,
   Link,
-} from '@chakra-ui/react';
+  Skeleton,
+  SkeletonText,
+  useToast,
+  IconButton,
+  useColorMode,
+  useColorModeValue,
+  Center,
+  Collapse,
+} from '@chakra-ui/react'
+import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 
 export default function PostDetailPage() {
-  const { id } = useParams();
-  if (!id || isNaN(Number(id))) return <Text>不正なIDです</Text>;
+  const { id } = useParams()
+  const router = useRouter()
+  const toast = useToast()
+  const { colorMode, toggleColorMode } = useColorMode()
 
-  const postId = Number(id);
+  if (!id || isNaN(Number(id))) {
+    return (
+      <Center h="100vh">
+        <Text color="red.500">不正なIDです</Text>
+      </Center>
+    )
+  }
+  const postId = Number(id)
+
+  // 投稿＋コメント取得
   const { data, loading, error, refetch } = useQuery(GET_COMMENTS, {
     variables: { id: postId },
-  });
+    fetchPolicy: 'network-only',
+  })
 
-  const [content, setContent] = useState('');
-  const [createComment, { loading: posting }] = useMutation(CREATE_COMMENT);
+  const [content, setContent] = useState('')
+  const [createComment, { loading: posting }] = useMutation(CREATE_COMMENT)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await createComment({
-      variables: { input: { content, postId } },
-    });
-    setContent('');
-    await refetch();
-  };
+    e.preventDefault()
+    try {
+      await createComment({ variables: { input: { content, postId } } })
+      setContent('')
+      await refetch()
+      toast({
+        title: 'コメントを投稿しました',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+    } catch (e) {
+      console.error(e)
+      toast({
+        title: '投稿に失敗しました',
+        status: 'error',
+        duration: 2000,
+        isClosable: true,
+      })
+    }
+  }
 
-  if (loading) return <Spinner />;
-  if (error) return <Text color="red.500">エラー: {error.message}</Text>;
-
-  const post = data.post;
+  // 色モードごとの背景色
+  const bg = useColorModeValue('white', 'gray.700')
+  const border = useColorModeValue('gray.200', 'gray.600')
 
   return (
     <>
-      {/* バージョン表示 */}
-      <Box bg="green.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
+      {/* カラーモード切替 */}
+      <IconButton
+        aria-label="Toggle color mode"
+        icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+        onClick={toggleColorMode}
+        position="fixed"
+        top="1rem"
+        right="1rem"
+        zIndex={10}
+      />
+
+      {/* バージョン */}
+      <Box bg="green.500" color="white" textAlign="center" py={2} fontSize="sm" fontWeight="bold">
         神戸電子2Days掲示板 Ver.0.1.3
       </Box>
-      
-      <Box mb={4}>
-        <NextLink href="/" passHref>
-          <Link color="blue.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }}>
-            ← メインページに戻る
-          </Link>
-        </NextLink>
-      </Box>
 
-      <Box maxW="2xl" mx="auto" p={8}>
-        <Heading size="lg" mb={2}>{post.title}</Heading>
-        <Text mb={6}>{post.content}</Text>
-
-        <Heading size="md" mt={8} mb={4}>コメント</Heading>
-
-        <Box as="form" onSubmit={handleSubmit}>
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="コメントを入力..."
-            minHeight="80px"
-            mb={4}
-            isRequired
-          />
-          <Button
-            type="submit"
-            colorScheme="blue"
-            isLoading={posting}
-          >
-            コメントする
-          </Button>
+      <Box maxW="2xl" mx="auto" p={6} bg={useColorModeValue('gray.50', 'gray.900')} minH="100vh">
+        <Box mb={4}>
+          <NextLink href="/" passHref>
+            <Link color="blue.500" fontWeight="bold" _hover={{ textDecoration: 'underline' }} aria-label="メインページに戻る">
+              ← メインページに戻る
+            </Link>
+          </NextLink>
         </Box>
 
-        <Divider my={6} />
-
-        <VStack align="stretch" spacing={4} mb={6}>
-          {post.comments.map((comment: any) => (
-            <Box key={comment.id} borderWidth="1px" borderRadius="md" p={4}>
-              <Text>{comment.content}</Text>
-              <Text fontSize="sm" color="gray.500" mt={2}>
-                {new Date(comment.createdAt).toLocaleString()}
+        {/* ローディング：Skeleton */}
+        {loading ? (
+          <Box>
+            <Skeleton height="32px" mb="4" />
+            <SkeletonText noOfLines={4} spacing="4" mb="6" />
+            {[...Array(2)].map((_, i) => (
+              <Box key={i} p={4} borderWidth="1px" borderRadius="md" mb="4">
+                <SkeletonText noOfLines={2} spacing="3" />
+              </Box>
+            ))}
+          </Box>
+        ) : error ? (
+          <Center py={10}>
+            <Box bg="red.50" p={4} borderRadius="md" border="1px solid" borderColor="red.200">
+              <Text color="red.600" fontWeight="bold" mb={2}>
+                エラー
               </Text>
+              <Text color="red.600">{error.message}</Text>
             </Box>
-          ))}
-        </VStack>
+          </Center>
+        ) : (
+          <>
+            {/* 投稿詳細 */}
+            <Box p={6} bg={bg} borderWidth="1px" borderColor={border} borderRadius="md" mb={8}>
+              <Heading size="lg" mb={4}>
+                {data.post.title}
+              </Heading>
+              <Collapse in={true} startingHeight={100}>
+                <Text whiteSpace="pre-wrap" color={useColorModeValue('gray.800', 'gray.200')}>
+                  {data.post.content}
+                </Text>
+              </Collapse>
+            </Box>
+
+            {/* コメントフォーム */}
+            <Box as="form" onSubmit={handleSubmit} mb={6}>
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.currentTarget.value)}
+                placeholder="コメントを入力..."
+                minH="100px"
+                mb={3}
+                isRequired
+                bg={bg}
+                borderColor={border}
+                _placeholder={{ color: 'gray.400' }}
+              />
+              <Button
+                type="submit"
+                colorScheme="green"
+                isLoading={posting}
+                aria-label="コメントを投稿"
+              >
+                コメントする
+              </Button>
+            </Box>
+
+            <Divider mb={6} />
+
+            {/* コメント一覧 */}
+            <VStack spacing={4} align="stretch">
+              {data.post.comments.length === 0 && (
+                <Text color="gray.500" textAlign="center">
+                  コメントはまだありません
+                </Text>
+              )}
+              {data.post.comments.map((comment: any) => (
+                <Box
+                  key={comment.id}
+                  p={4}
+                  bg={bg}
+                  borderWidth="1px"
+                  borderColor={border}
+                  borderRadius="md"
+                >
+                  <Text whiteSpace="pre-wrap">{comment.content}</Text>
+                  <Text fontSize="sm" color="gray.500" mt={2}>
+                    {new Date(comment.createdAt).toLocaleString()}
+                  </Text>
+                </Box>
+              ))}
+            </VStack>
+          </>
+        )}
       </Box>
     </>
-  );
+  )
 }
