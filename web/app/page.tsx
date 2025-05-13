@@ -38,6 +38,8 @@ const REACTION_TYPE = "laugh"; // サーバー側でこの type を受け付け�
 export default function Home() {
   // --- ここに更新履歴を定義 ---
   const updates = [
+    { date: "2025/05/13", text: "投稿字数の変更" },
+    { date: "2025/05/13", text: "並び順エラー修正" },
     { date: "2025/05/13", text: "いいね機能にトーストを追加" },
     { date: "2025/05/13", text: "UI・UXの改善" },
     { date: "2025/05/13", text: "ダークモード切替ボタンを設置" },
@@ -239,8 +241,8 @@ export default function Home() {
             {/* 説明文 */}
             <Box textAlign="center" px={4}>
               <Text fontSize="md" color="gray.600" maxW="600px" mx="auto">
-                〜神戸電子2Days掲示板〜へようこそ。<br />
-                ここは神戸電子生が匿名でつぶやきをする場所です。<br />
+                〜神戸電子2Days掲示板〜<br />
+                ここは神戸電子生が匿名でつぶやきをする場所<br />
                 つぶやき（投稿）は2日で自動削除されます。<br />
                 存分につぶやきましょう〜
               </Text>
@@ -312,7 +314,7 @@ export default function Home() {
 
                     <Flex justify="space-between" mt={3} align="center">
                       <Text fontSize="sm" color="gray.500" fontWeight="medium">
-                        投稿日: {format(new Date(post.createdAt), "yyyy/MM/dd HH:mm")}
+                        投稿日: {format(new Date(post.createdAt), "MM/dd HH:mm")}
                       </Text>
                       <Text fontSize="sm" color="gray.500">
                         コメント数: {post.comments.length}
