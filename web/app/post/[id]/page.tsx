@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery, useMutation } from '@apollo/client'
-import { GET_COMMENTS, CREATE_COMMENT } from '@/lib/queries'
+import { GET_POSTS, CREATE_COMMENT } from '@/lib/queries'
 import { useState } from 'react'
 import NextLink from 'next/link'
 import {
@@ -50,7 +50,7 @@ export default function PostDetailPage() {
   const postId = Number(id)
 
   // 投稿＋コメント取得
-  const { data, loading, error, refetch } = useQuery(GET_COMMENTS, {
+  const { data, loading, error, refetch } = useQuery(GET_POSTS, {
     variables: { id: postId },
     fetchPolicy: 'network-only',
   })
