@@ -12,7 +12,6 @@ import {
   VStack,
   Textarea,
   Button,
-  Spinner,
   Divider,
   Link,
   Skeleton,
@@ -46,6 +45,14 @@ export default function PostDetailPage() {
     variables: { id: postId },
     fetchPolicy: 'network-only',
   })
+
+  // コメントを作成日時順（昇順）にソート
+  const sortedComments = data?.post?.comments
+    ? [...data.post.comments].sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      )
+    : []
 
   const [content, setContent] = useState('')
   const [createComment, { loading: posting }] = useMutation(CREATE_COMMENT)
@@ -165,12 +172,12 @@ export default function PostDetailPage() {
 
             {/* コメント一覧 */}
             <VStack spacing={4} align="stretch">
-              {data.post.comments.length === 0 && (
+              {sortedComments.length === 0 && (
                 <Text color="gray.500" textAlign="center">
                   コメントはまだありません
                 </Text>
               )}
-              {data.post.comments.map((comment: any) => (
+              {sortedComments.map((comment: any) => (
                 <Box
                   key={comment.id}
                   p={4}
@@ -181,7 +188,13 @@ export default function PostDetailPage() {
                 >
                   <Text whiteSpace="pre-wrap">{comment.content}</Text>
                   <Text fontSize="sm" color="gray.500" mt={2}>
-                    {new Date(comment.createdAt).toLocaleString()}
+                    {new Date(comment.createdAt).toLocaleDateString('ja-JP', {
+                      month: 'numeric',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
                   </Text>
                 </Box>
               ))}

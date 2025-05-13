@@ -110,11 +110,11 @@ export default function NewPostPage() {
                   placeholder="投稿のタイトルを入力"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  maxLength={100}
+                  maxLength={30}
                   aria-describedby="title-helper"
                 />
                 <FormHelperText id="title-helper">
-                  {title.length}/100 文字
+                  {title.length}/30 文字
                 </FormHelperText>
               </FormControl>
 
@@ -125,11 +125,11 @@ export default function NewPostPage() {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   minH="120px"
-                  maxLength={1000}
+                  maxLength={500}
                   aria-describedby="content-helper"
                 />
                 <FormHelperText id="content-helper">
-                  {content.length}/1000 文字
+                  {content.length}/500 文字
                 </FormHelperText>
               </FormControl>
 
