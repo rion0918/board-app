@@ -49,8 +49,9 @@ export default function NewPostPage() {
 
   return (
     <>
-      <Box bg="blue.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
-        神戸電子2Days掲示板 Ver.0.0.2
+      {/* バージョン表示 */}
+      <Box bg="green.500" py={2} px={4} color="white" textAlign="center" fontWeight="bold" fontSize="sm">
+        神戸電子2Days掲示板 Ver.0.1.3
       </Box>
       
       <Box mb={4}>
