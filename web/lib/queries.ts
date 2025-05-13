@@ -45,6 +45,10 @@ export const GET_ALL_POSTS = gql`
       comments {
         id
       }
+      reactions {
+        id
+        type
+      }
     }
   }
 `
