@@ -27,8 +27,16 @@ export class PostService {
   async removePost() {
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
-    // コメント → 投稿 の順で削除
+    // コメント → リアクション → 投稿 の順で削除
     await this.prisma.comment.deleteMany({
+      where: {
+        createdAt: {
+          lt: twoDaysAgo,
+        },
+      },
+    });
+
+    await this.prisma.reaction.deleteMany({
       where: {
         createdAt: {
           lt: twoDaysAgo,
