@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,21 +13,21 @@ model Post {
   content   String
   createdAt DateTime   @default(now())
   comments  Comment[]
-  Reactions Reaction[]
+  Reaction  Reaction[]
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
   content   String
-  post      Post     @relation(fields: [postId], references: [id])
   postId    Int
   createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Reaction {
   id        Int      @id @default(autoincrement())
+  type      String
   postId    Int
-  post      Post     @relation(fields: [postId], references: [id])
   createdAt DateTime @default(now())
-  type      String //ex: "like","sad"など
+  post      Post     @relation(fields: [postId], references: [id])
 }
