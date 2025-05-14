@@ -25,7 +25,7 @@ import { useMutation } from "@apollo/client";
 import { CREATE_POST } from "@/lib/queries";
 
 // ハードコーディングする公式パスワード
-const ADMIN_PASSWORD = "0715";
+const ADMIN_PASSWORD = "071512345";
 
 export default function NewPostPage() {
   const router = useRouter();
