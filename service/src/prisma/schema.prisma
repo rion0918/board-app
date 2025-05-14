@@ -8,20 +8,22 @@ datasource db {
 }
 
 model Post {
-  id        Int        @id @default(autoincrement())
-  title     String
-  content   String
-  createdAt DateTime   @default(now())
-  comments  Comment[]
-  Reaction  Reaction[]
+  id         Int        @id @default(autoincrement())
+  title      String
+  content    String
+  createdAt  DateTime   @default(now())
+  isOfficial Boolean    @default(false)
+  comments   Comment[]
+  Reaction   Reaction[]
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
-  postId    Int
-  createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
+  id         Int      @id @default(autoincrement())
+  content    String
+  isOfficial Boolean  @default(false)
+  postId     Int
+  createdAt  DateTime @default(now())
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Reaction {
@@ -29,5 +31,5 @@ model Reaction {
   type      String
   postId    Int
   createdAt DateTime @default(now())
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
