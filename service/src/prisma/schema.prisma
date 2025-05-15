@@ -14,7 +14,7 @@ model Post {
   createdAt  DateTime   @default(now())
   isOfficial Boolean    @default(false)
   comments   Comment[]
-  Reaction   Reaction[]
+  reaction   Reaction[]
 }
 
 model Comment {
