@@ -25,8 +25,11 @@ export class PostResolver {
 
   //全件取得
   @Query(() => [Post])
-  allPosts(): Promise<Post[]> {
-    return this.postService.findAll();
+  allPosts(
+    @Args('limit', { type: () => Int, nullable: true }) limit?: number,
+    @Args('offset', { type: () => Int, nullable: true }) offset?: number,
+  ): Promise<Post[]> {
+    return this.postService.findAll({ limit, offset });
   }
 
   //ID指定取得

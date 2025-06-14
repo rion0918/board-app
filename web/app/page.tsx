@@ -33,6 +33,8 @@ import {
 } from "@chakra-ui/icons";
 import { GET_ALL_POSTS, CREATE_REACTION } from "@/lib/queries";
 
+const POSTS_PER_PAGE = 10;
+
 // フロントで扱うリアクションタイプを定義
 const REACTION_TYPE = "laugh";
 
@@ -49,11 +51,13 @@ export default function Home() {
   const [reactedPosts, setReactedPosts] = useState<number[]>([]);
   const [showMore, setShowMore] = useState<Record<number, boolean>>({});
   const [showUpdates, setShowUpdates] = useState(false);
+  const [page, setPage] = useState(0);
 
   const toast = useToast();
   const { colorMode, toggleColorMode } = useColorMode();
 
-  const { data, loading, error } = useQuery(GET_ALL_POSTS, {
+  const { data, loading, error, refetch } = useQuery(GET_ALL_POSTS, {
+    variables: { limit: POSTS_PER_PAGE, offset: page * POSTS_PER_PAGE },
     fetchPolicy: "network-only",
   });
 
@@ -319,6 +323,28 @@ export default function Home() {
                 );
               })}
             </VStack>
+            <Flex justify="space-between" mt={4}>
+              <Button
+                onClick={() => {
+                  const prev = Math.max(page - 1, 0);
+                  setPage(prev);
+                  refetch({ limit: POSTS_PER_PAGE, offset: prev * POSTS_PER_PAGE });
+                }}
+                isDisabled={page === 0}
+              >
+                前へ
+              </Button>
+              <Button
+                onClick={() => {
+                  const next = page + 1;
+                  setPage(next);
+                  refetch({ limit: POSTS_PER_PAGE, offset: next * POSTS_PER_PAGE });
+                }}
+                isDisabled={data?.allPosts.length < POSTS_PER_PAGE}
+              >
+                次へ
+              </Button>
+            </Flex>
           </VStack>
         </Container>
       </Box>

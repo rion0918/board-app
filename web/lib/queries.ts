@@ -36,8 +36,8 @@ export const CREATE_POST = gql`
 `;
 
 export const GET_ALL_POSTS = gql`
-  query GetAllPosts {
-    allPosts {
+  query GetAllPosts($limit: Int, $offset: Int) {
+    allPosts(limit: $limit, offset: $offset) {
       id
       title
       content
@@ -51,7 +51,7 @@ export const GET_ALL_POSTS = gql`
       }
     }
   }
-`
+`;
 
 export const CREATE_REACTION = gql`
   mutation CreateReaction($input: CreateReactionInput!) {

@@ -8,9 +8,19 @@ import { Post } from './entities/post.entity';
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  //全件取得
-  async findAll() {
-    return this.prisma.post.findMany({ orderBy: { createdAt: 'desc' } });
+  // ページネーション対応
+  async findAll({
+    limit,
+    offset,
+  }: {
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<Post[]> {
+    return this.prisma.post.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+      skip: offset,
+    });
   }
 
   //ID指定取得
