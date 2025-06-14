@@ -32,7 +32,7 @@ type Reaction {
 }
 
 type Query {
-  allPosts: [Post!]!
+  allPosts(limit: Int, offset: Int): [Post!]!
   post(id: Int!): Post!
   findByPost(postId: Int!): [Comment!]!
 }
