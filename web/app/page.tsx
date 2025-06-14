@@ -40,6 +40,7 @@ const REACTION_TYPE = "laugh";
 
 export default function Home() {
   const updates = [
+    { date: "2025/06/14", text: "投稿のページ分け" },
     { date: "2025/05/13", text: "公式機能" },
     { date: "2025/05/13", text: "投稿字数の変更" },
     { date: "2025/05/13", text: "並び順エラー修正" },
