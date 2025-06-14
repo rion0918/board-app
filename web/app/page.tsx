@@ -72,19 +72,13 @@ export default function Home() {
         type: REACTION_TYPE,
       },
     }),
-    update(cache, { data: { createReaction } }) {
-      const existing = cache.readQuery({ query: GET_ALL_POSTS }) as any;
-      if (!existing) return;
-      const newPosts = existing.allPosts.map((post: any) =>
-        post.id === createReaction.postId
-          ? { ...post, reactions: [...post.reactions, createReaction] }
-          : post
-      );
-      cache.writeQuery({
+    refetchQueries: [
+      {
         query: GET_ALL_POSTS,
-        data: { allPosts: newPosts },
-      });
-    },
+        variables: { limit: POSTS_PER_PAGE, offset: page * POSTS_PER_PAGE },
+      },
+    ],
+    awaitRefetchQueries: true,
   });
 
   const handleReaction = async (postId: number) => {
