@@ -1,25 +1,25 @@
 # 📝 神戸電子2DAYS掲示板アプリ
 
-Next.js × NestJS × GraphQL × Chakra UI で構成されたシンプルな掲示板アプリです。
+Next.js × NestJS × GraphQL × Chakra UI を使用
 
 ---
 
-## 🧱 使用スタック
+## 🧱 技術スタック
 
-| 領域       | 技術構成                                         |
-|------------|--------------------------------------------------|
-| フロント   | Next.js (App Router) / Apollo Client / Chakra UI |
-| バックエンド | NestJS / GraphQL (Code First) / Prisma ORM       |
-| データベース | PostgreSQL                                       |
-| その他     | TypeScript / pnpm                                 |
+| 区分           | 技術                                           |
+| -------------- | ---------------------------------------------- |
+| フロントエンド | Next.js (App Router), Apollo Client, Chakra UI |
+| バックエンド   | NestJS, GraphQL (Code First), Prisma ORM       |
+| データベース   | PostgreSQL                                     |
+| その他         | TypeScript, pnpm                               |
 
 ---
 
-## 🚀 起動手順
+## 🚀 開発環境の起動手順
 
-### 1. パッケージインストール
+### 1. パッケージのインストール
 
-
+```bash
 # フロントエンド
 cd web
 pnpm install
@@ -27,11 +27,17 @@ pnpm install
 # バックエンド
 cd ../service
 pnpm install
+```
 
-### 2. Prisma セットアップ（DB & Client）
+### 2. Prisma セットアップ（DB 初期化）
+
+```bash
 pnpm prisma migrate dev --name init --schema=src/prisma/schema.prisma
+```
 
-### 3. サーバー起動
+### 3. アプリケーション起動
+
+```bash
 # バックエンド（NestJS）
 cd service
 pnpm run start:dev
@@ -39,13 +45,19 @@ pnpm run start:dev
 # フロントエンド（Next.js）
 cd ../web
 pnpm run dev
+```
 
-### 4. URL 一覧
-•	フロントエンド: http://localhost:3000
-•	GraphQL API: http://localhost:3900/graphql
+### 4. アクセス URL
 
-### メモ
-•	Chakra UI テーマは app/providers.tsx にて定義
-•	GraphQL スキーマは Code First で自動生成
-•	Prisma スキーマ：src/prisma/schema.prisma
-```bash
+- フロントエンド: http://localhost:3000
+- GraphQL API: http://localhost:3900/graphql
+
+### 5. デプロイ先
+
+- 本番環境: https://board-app-phi.vercel.app/
+
+### 📌 メモ
+
+- Chakra UI のテーマ定義: `web/app/providers.tsx`
+- GraphQL スキーマは Code First により自動生成
+- Prisma スキーマ定義: `service/src/prisma/schema.prisma`
