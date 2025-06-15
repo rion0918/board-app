@@ -26,8 +26,8 @@ import {
   FormLabel,
   Input,
   Switch,
-  Badge,             // 追加
-  Flex,              // 追加
+  Badge,             
+  Flex,              
 } from '@chakra-ui/react'
 import { MoonIcon, SunIcon } from '@chakra-ui/icons'
 

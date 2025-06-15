@@ -23,7 +23,7 @@ import {
   IconButton,
   useColorMode,
   useColorModeValue,
-  Badge,            // 追加
+  Badge,            
 } from "@chakra-ui/react";
 import {
   AddIcon,
@@ -49,12 +49,17 @@ export default function Home() {
     { date: "2025/05/13", text: "ダークモード切替ボタンを設置" },
   ];
 
+  // リアクション済みの投稿IDを管理する状態
   const [reactedPosts, setReactedPosts] = useState<number[]>([]);
+  // 投稿の詳細を表示するための状態
   const [showMore, setShowMore] = useState<Record<number, boolean>>({});
+  // アップデート情報の表示状態
   const [showUpdates, setShowUpdates] = useState(false);
+  // ページネーションのための状態
   const [page, setPage] = useState(0);
 
   const toast = useToast();
+  // カラーモードの切替
   const { colorMode, toggleColorMode } = useColorMode();
 
   const { data, loading, error, refetch } = useQuery(GET_ALL_POSTS, {
@@ -62,6 +67,7 @@ export default function Home() {
     fetchPolicy: "network-only",
   });
 
+  // リアクションを作成するためのミューテーション
   const [createReaction] = useMutation(CREATE_REACTION, {
     optimisticResponse: ({ input: { postId } }) => ({
       __typename: "Mutation",
@@ -81,6 +87,7 @@ export default function Home() {
     awaitRefetchQueries: true,
   });
 
+  // 草リアクションを送信する関数
   const handleReaction = async (postId: number) => {
     if (reactedPosts.includes(postId)) return;
     try {
@@ -133,7 +140,6 @@ export default function Home() {
     );
   }
 
-  const bgColor = useColorModeValue("white", "gray.800");
   const cardBgColor = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
 
