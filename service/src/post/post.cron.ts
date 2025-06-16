@@ -8,7 +8,7 @@ export class PostCron {
   constructor(private readonly postService: PostService) {}
 
   // 毎日深夜3時に実行
-  @Cron('0 3 * * *')
+  @Cron('10 12 * * *') // 毎日12時10分に実行
   handleCron() {
     this.postService.removePost();
   }
