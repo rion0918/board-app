@@ -11,5 +11,6 @@ export class PostCron {
   @Cron('0 3 * * *')
   async handleCron() {
     await this.postService.removePost();
+    console.log('自動処理実行');
   }
 }

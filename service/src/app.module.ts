@@ -6,8 +6,7 @@ import { join } from 'path';
 import { PostModule } from './post/post.module';
 import { CommentModule } from './comment/comment.module';
 import { ReactionModule } from './reaction/reaction.module';
-import { ScheduleModule } from '@nestjs/schedule'; // ← 追加
-import { PostCron } from './post/post.cron';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -22,6 +21,5 @@ import { PostCron } from './post/post.cron';
     CommentModule,
     ReactionModule,
   ],
-  providers: [PostCron], // 発火イベント
 })
 export class AppModule {}
