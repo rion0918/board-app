@@ -9,7 +9,7 @@ export class PostCron {
 
   // 毎日深夜3時に実行
   @Cron('0 3 * * *')
-  handleCron() {
-    this.postService.removePost();
+  async handleCron() {
+    await this.postService.removePost();
   }
 }
